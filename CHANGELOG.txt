@@ -1,0 +1,5 @@
+26.05.23: Installation of the project
+          INPUTS folder contains a few datasets downloaded from https://tdcommons.ai
+          SCRIPTS contains a few initial scripts, which:
+              - downloads the data
+              - encodes chemical data into learning features
