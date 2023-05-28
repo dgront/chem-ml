@@ -15,17 +15,19 @@ encode_atoms = Encoder(*['C','N','O','S','F','Si','P','Cl','Br','Mg','Na','Ca',
 		    'Pd','Co','Se','Ti','Zn', 'Li','Ge','Cu','Au','Ni','Cd',
 		    'In','Mn','Zr','Cr','Pt','Hg','Pb','Unknown'])
 
+encode_atoms_HCNO = Encoder(*['H','C','N','O','Unknown'])
+
 encode_bond_types = Encoder(*[Chem.rdchem.BondType.SINGLE, Chem.rdchem.BondType.DOUBLE,
 			    Chem.rdchem.BondType.TRIPLE, Chem.rdchem.BondType.AROMATIC])
 
-def mol_atoms_to_data(mol_object):
+def mol_atoms_to_data(mol_object, encoder=encode_atoms):
 
     n_atoms = mol_object.GetNumAtoms()
-    n_atom_features = encode_atoms.n_features()
+    n_atom_features = encoder.n_features()
     X = np.zeros((n_atoms, n_atom_features))
     for atom in mol_object.GetAtoms():
         s = atom.GetSymbol()
-        X[atom.GetIdx(), :] = np.array(encode_atoms.encode_binary(s))
+        X[atom.GetIdx(), :] = np.array(encoder.encode_binary(s))
 
     X = torch.tensor(X, dtype = torch.float)
 
@@ -62,13 +64,13 @@ def smiles_to_graph_data(x_smilest):
         molecule_to_graph_data(mol)
     return all_data
 
-#mol_atoms_to_data("CCN1C(=O)/C(=C2\SC(=S)N(CCCOC)C2=O)c2ccccc21")
+if __name__ == "__main__":
+    #mol_atoms_to_data("CCN1C(=O)/C(=C2\SC(=S)N(CCCOC)C2=O)c2ccccc21")
 
-df = pd.read_csv('../INPUTS/data/cyp2c19_veith.tab', sep='\t')
-x_smiles = df['Drug']
-y = df['Y']
-x_features = smiles_to_graph_data(x_smiles[:1])
+    df = pd.read_csv('../INPUTS/data/cyp2c19_veith.tab', sep='\t')
+    x_smiles = df['Drug']
+    y = df['Y']
+    x_features = smiles_to_graph_data(x_smiles[:1])
 
-
-print(len(x_features))
+    print(len(x_features))
 
