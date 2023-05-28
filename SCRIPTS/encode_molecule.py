@@ -33,10 +33,6 @@ def mol_atoms_to_data(mol_object, encoder=encode_atoms):
 
     return X
 
-def bond_features(a_bond):
-    bond_features_vector = encode_bond_types.encode_binary(a_bond.GetBondType())
-    return np.array(bond_features_vector)
-
 
 def mol_bonds_to_data(mol_object):
 
@@ -46,7 +42,9 @@ def mol_bonds_to_data(mol_object):
     n_edge_features = encode_bond_types.n_features()
     edge_features = np.zeros((n_edges, n_edge_features))
     for (k, (i,j)) in enumerate(zip(rows, cols)):
-        edge_features[k, :] = np.array(bond_features(mol_object.GetBondBetweenAtoms(int(i),int(j))))
+        a_bond = mol_object.GetBondBetweenAtoms(int(i),int(j))
+        one_bond_features = encode_bond_types.encode_binary(a_bond.GetBondType())
+        edge_features[k, :] = np.array(one_bond_features)
 
     return (rows, cols, edge_features)
 
