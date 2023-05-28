@@ -22,6 +22,8 @@ class Encoder:
         for t, val in token_values.items(): out[self.__labels.get(t, self.__default_idx)] = val
         return out
 
+    def n_features(self):
+        return len(self.__labels)
 
 if __name__ == "__main__":
     e = Encoder("One", "Two", "Three", "Five", default_idx=0)
