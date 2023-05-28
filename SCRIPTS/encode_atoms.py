@@ -15,6 +15,9 @@ encode_atoms = Encoder(*['C','N','O','S','F','Si','P','Cl','Br','Mg','Na','Ca',
 		    'Pd','Co','Se','Ti','Zn', 'Li','Ge','Cu','Au','Ni','Cd',
 		    'In','Mn','Zr','Cr','Pt','Hg','Pb','Unknown'])
 
+encode_bond_types = Encoder(*[Chem.rdchem.BondType.SINGLE, Chem.rdchem.BondType.DOUBLE,
+			    Chem.rdchem.BondType.TRIPLE, Chem.rdchem.BondType.AROMATIC])
+
 def mol_atoms_to_data(mol_object):
 
     n_atoms = mol_object.GetNumAtoms()
@@ -28,19 +31,35 @@ def mol_atoms_to_data(mol_object):
 
     return X
 
+def bond_features(a_bond):
+    bond_features_vector = encode_bond_types.encode_binary(a_bond.GetBondType())
+    return np.array(bond_features_vector)
+
+
 def mol_bonds_to_data(mol_object):
 
-# construct edge index array E of shape (2, n_edges)
+    # --- construct edge index array E of shape (2, n_edges)
     (rows, cols) = np.nonzero(GetAdjacencyMatrix(mol_object))
+    n_edges = len(rows)
+    n_edge_features = encode_bond_types.n_features()
+    edge_features = np.zeros((n_edges, n_edge_features))
+    for (k, (i,j)) in enumerate(zip(rows, cols)):
+        edge_features[k, :] = np.array(bond_features(mol_object.GetBondBetweenAtoms(int(i),int(j))))
 
+    return (rows, cols, edge_features)
 
-def smiles_to_graph_data(x_smiles):
+def molecule_to_graph_data(mol_object):
+
+    X = mol_atoms_to_data(mol_object)
+    EF = mol_bonds_to_data(mol_object)
+    return (X, EF)
+
+def smiles_to_graph_data(x_smilest):
 
     all_data = []
     for smiles in x_smiles:
         mol = Chem.MolFromSmiles(smiles)
-        X = mol_atoms_to_data(mol)
-        all_data.append(X)
+        molecule_to_graph_data(mol)
     return all_data
 
 #mol_atoms_to_data("CCN1C(=O)/C(=C2\SC(=S)N(CCCOC)C2=O)c2ccccc21")
@@ -49,6 +68,7 @@ df = pd.read_csv('../INPUTS/data/cyp2c19_veith.tab', sep='\t')
 x_smiles = df['Drug']
 y = df['Y']
 x_features = smiles_to_graph_data(x_smiles[:1])
+
 
 print(len(x_features))
 
