@@ -65,7 +65,7 @@ def smiles_to_graph_data(x_smilest):
 if __name__ == "__main__":
     #mol_atoms_to_data("CCN1C(=O)/C(=C2\SC(=S)N(CCCOC)C2=O)c2ccccc21")
 
-    df = pd.read_csv('../INPUTS/data/cyp2c19_veith.tab', sep='\t')
+    df = pd.read_csv('../INPUTS/tdcommons-data/cyp2c19_veith.tab', sep='\t')
     x_smiles = df['Drug']
     y = df['Y']
     x_features = smiles_to_graph_data(x_smiles[:1])

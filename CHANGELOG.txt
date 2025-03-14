@@ -1,3 +1,5 @@
+14.03.25: data folder renamed to tdcommons-data as new datasets will be uploated soon
+
 26.05.23: Installation of the project
           INPUTS folder contains a few datasets downloaded from https://tdcommons.ai
           SCRIPTS contains a few initial scripts, which:
